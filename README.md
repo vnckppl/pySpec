@@ -1,4 +1,4 @@
-This shell script let's you create a
+This shell Python script let's you create a spectrogram from most type of audio files.
 
 The script requires [ffmpeg](https://ffmpeg.org/) to be installed and requires the following Python libraries: numpy, matplotlib, wave. You can install these requirements by running:
 
