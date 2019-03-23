@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-# 2018-01-09
-# Create spectogram from wave file
+# Create spectogram from audio file
 
+# Libraries
 import os
 import sys
 import wave
@@ -10,7 +10,6 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import subprocess
 from shutil import copy2 as cp
-
 
 # Colors
 class bcolors:
@@ -36,7 +35,6 @@ music_file_tmp=music_file.replace(" ", "_")
 cp(music_file, music_file_tmp)
 
 # Convert music file to wav
-# See: https://stackoverflow.com/questions/20140137/passing-variables-to-subprocess-popen
 print bcolors.FAIL + "\n--> CONVERTING MUSIC FILE TO WAV\n" + bcolors.ENDC
 command="ffmpeg -i %s -ar 44100 -ac 1 %s" % (music_file_tmp, wavname)
 process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
@@ -52,9 +50,7 @@ def get_wav_info(wavname):
     sound_info = np.fromstring(frames, 'int16')
     frame_rate = wav.getframerate()
     wav.close()
-    #np.savetxt('/Users/vincent/Downloads/mps/test.txt',sound_info)
     return sound_info, frame_rate
-
 
 # Define function for plotting
 def graph_spectrogram(wavname):
@@ -82,7 +78,6 @@ def graph_spectrogram(wavname):
     cbar.ax.set_ylabel('dB')
     plt.savefig(dirname+'/'+outname+'.png')
 
-
 # Save spectrogram
 graph_spectrogram(wavname)
 
@@ -90,5 +85,3 @@ graph_spectrogram(wavname)
 os.remove(wavname)
 os.remove(music_file_tmp)
 
-
-# https://stackoverflow.com/questions/33680633/how-to-change-pyplot-specgram-x-and-y-axis-scaling
