@@ -11,6 +11,7 @@ import matplotlib.ticker as ticker
 import subprocess
 from shutil import copy2 as cp
 
+
 # Colors
 class bcolors:
     HEADER = '\033[95m'
@@ -22,28 +23,34 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
-# Read in last argument as music file
+
+# * Read in last argument as music file
 music_file = sys.argv[-1]
 
-# Define output file name
-outname=os.path.splitext(os.path.basename(music_file))[0]
-dirname=os.path.dirname(music_file)
-wavname=(dirname+'/'+outname+'.wav').replace(" ", "_")
+# * Define output file name
+outname = os.path.splitext(os.path.basename(music_file))[0]
+dirname = os.path.dirname(music_file)
+wavname = (dirname + '/' + outname + '.wav').replace(" ", "_")
 
-# ffmpeg does not work with spaces, copy to tmp file
-music_file_tmp=music_file.replace(" ", "_")
-cp(music_file, music_file_tmp)
+# * ffmpeg does not work with spaces, copy to tmp file
+# Only do this if there are spaces in the filename
+if ' ' in music_file:
+    music_file_tmp = music_file.replace(" ", "_")
+    cp(music_file, music_file_tmp)
+else:
+    music_file_tmp = music_file
 
 # Convert music file to wav
-print bcolors.FAIL + "\n--> CONVERTING MUSIC FILE TO WAV\n" + bcolors.ENDC
-command="ffmpeg -i %s -ar 44100 -ac 1 %s" % (music_file_tmp, wavname)
+print(bcolors.FAIL + "\n--> CONVERTING MUSIC FILE TO WAV\n" + bcolors.ENDC)
+command = "ffmpeg -i %s -ar 44100 -ac 1 %s" % (music_file_tmp, wavname)
 process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
 output, error = process.communicate()
 
 # Create spectogram
-print bcolors.FAIL + "\n--> CREATE SPECTOGRAM\n" + bcolors.ENDC
+print(bcolors.FAIL + "\n--> CREATE SPECTOGRAM\n" + bcolors.ENDC)
 
-# Get file info   
+
+# Get file info
 def get_wav_info(wavname):
     wav = wave.open(wavname, 'r')
     frames = wav.readframes(-1)
@@ -52,6 +59,7 @@ def get_wav_info(wavname):
     wav.close()
     return sound_info, frame_rate
 
+
 # Define function for plotting
 def graph_spectrogram(wavname):
     sound_info, frame_rate = get_wav_info(wavname)
@@ -59,8 +67,8 @@ def graph_spectrogram(wavname):
     plt.rcParams['savefig.facecolor'] = 'black'
     plt.rcParams['axes.edgecolor'] = 'white'
     plt.rcParams['lines.color'] = 'white'
-    plt.rcParams['text.color'] = 'white'    
-    plt.rcParams['xtick.color'] = 'white'    
+    plt.rcParams['text.color'] = 'white'
+    plt.rcParams['xtick.color'] = 'white'
     plt.rcParams['ytick.color'] = 'white'
     plt.rcParams['axes.labelcolor'] = 'white'
     fig = plt.figure(num=None, figsize=(12, 7.5), dpi=300)
@@ -78,10 +86,10 @@ def graph_spectrogram(wavname):
     cbar.ax.set_ylabel('dB')
     plt.savefig(dirname+'/'+outname+'.png')
 
+
 # Save spectrogram
 graph_spectrogram(wavname)
 
 # Remove wav file and temporary file
 os.remove(wavname)
 os.remove(music_file_tmp)
-
